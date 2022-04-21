@@ -6,7 +6,7 @@ import '../styles/_discover-block.scss';
 
 //TODO: Fix types here
 
-const scrollContainer = (id: any, { isNegative }: any = {}) => {
+const scrollContainer = (id: string, { isNegative }: any = {}) => {
   return () => {
     const scrollableContainer: any = document.getElementById(id);
     const amount = isNegative ? -scrollableContainer.offsetWidth : scrollableContainer.offsetWidth;
@@ -16,10 +16,10 @@ const scrollContainer = (id: any, { isNegative }: any = {}) => {
 }
 
 interface IDiscoverBlockProps {
-  text: any;
-  id: any;
+  text: string;
+  id: string;
   data: any;
-  imagesKey: any;
+  imagesKey: string;
 }
 
 export default class DiscoverBlock extends React.Component<IDiscoverBlockProps> {
@@ -28,6 +28,7 @@ export default class DiscoverBlock extends React.Component<IDiscoverBlockProps> 
   }
   render = () => {
     const { text, id, data, imagesKey } = this.props;
+
     return (
       <div className="discover-block">
         <div className="discover-block__header">
