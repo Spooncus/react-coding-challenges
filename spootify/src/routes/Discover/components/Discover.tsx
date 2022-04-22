@@ -48,7 +48,7 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
   date = `${this.tempDate.getFullYear()}-${this.formatTwoDigits(this.tempDate.getMonth()+1)}-${this.formatTwoDigits(this.tempDate.getDate())}T${this.formatTwoDigits(this.tempDate.getHours())}:${this.formatTwoDigits(this.tempDate.getMinutes())}:${this.formatTwoDigits(this.tempDate.getSeconds())}`;
 
   config = {
-    headers: { Authorization: `Bearer BQAFmmzz3IHV0G36P8LmAhm0G4Cqryz-9V33K51ZbBmE3l6SYhi7RykM0VVR80-TGGM8y4tSS9IWrDWk44NyrlD3GswbYyjNlEe6HTqEWpu6XSrO8SWcObyBr7kcVYklLm7aU4soTq1ddWVJEK6oIn3AEt8j` }
+    headers: { Authorization: `Bearer j` }
   };
 
   getNewReleaseData() {
