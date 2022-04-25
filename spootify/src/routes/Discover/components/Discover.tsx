@@ -6,7 +6,7 @@ import { spotifyApiUri } from '../../../constants/constants';
 
 //TODO: Fix `any` types here
 
-interface IDiscoverProps {}
+interface IDiscoverProps { }
 
 interface IInterfaceWithImages {
   images: Array<IImage>,
@@ -18,7 +18,7 @@ interface IInterfaceWithIcon {
   name: string,
 }
 
-interface IImage{
+interface IImage {
   height: number,
   url: string,
   width: number
@@ -45,57 +45,74 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
 
   formatTwoDigits = (digit: number) => ("0" + digit).slice(-2);
   tempDate = new Date();
-  date = `${this.tempDate.getFullYear()}-${this.formatTwoDigits(this.tempDate.getMonth()+1)}-${this.formatTwoDigits(this.tempDate.getDate())}T${this.formatTwoDigits(this.tempDate.getHours())}:${this.formatTwoDigits(this.tempDate.getMinutes())}:${this.formatTwoDigits(this.tempDate.getSeconds())}`;
+  date = `${this.tempDate.getFullYear()}-${this.formatTwoDigits(this.tempDate.getMonth() + 1)}-${this.formatTwoDigits(this.tempDate.getDate())}T${this.formatTwoDigits(this.tempDate.getHours())}:${this.formatTwoDigits(this.tempDate.getMinutes())}:${this.formatTwoDigits(this.tempDate.getSeconds())}`;
 
-  config = {
-    headers: { Authorization: `Bearer BQAFmmzz3IHV0G36P8LmAhm0G4Cqryz-9V33K51ZbBmE3l6SYhi7RykM0VVR80-TGGM8y4tSS9IWrDWk44NyrlD3GswbYyjNlEe6HTqEWpu6XSrO8SWcObyBr7kcVYklLm7aU4soTq1ddWVJEK6oIn3AEt8j` }
-  };
+  bearerBody = new URLSearchParams({
+    "grant_type": 'client_credentials'
+  })
 
-  getNewReleaseData() {
-    axios.get(`${spotifyApiUri}/new-releases?country=TR&limit=10&offset=5`, this.config)
-    .then((resp) => {
-      if(resp.status === 200) {
-        this.setState({newReleases: resp.data.albums.items})
-        // console.log(resp.data);
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-    })
+  getBearerToken() {
+    axios.post(`https://accounts.spotify.com/api/token`,
+      this.bearerBody,
+      { headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8", "Authorization": "Basic " + btoa(process.env.REACT_APP_SPOTIFY_CLIENT_ID + ":" + process.env.REACT_APP_SPOTIFY_CLIENT_SECRET) } })
+      .then((resp) => {
+        if (resp.status === 200) {
+          this.getNewReleaseData(resp.data.access_token);
+          this.getFeaturedPlaylistsData(resp.data.access_token);
+          this.getCategoriesData(resp.data.access_token);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
   }
 
-  getCategoriesData() {
-    axios.get(`${spotifyApiUri}/categories?country=TR&locale=tr_TR&limit=10&offset=3`, this.config)
-    .then((resp) => {
-      if(resp.status === 200) {
-        this.setState({categories: resp.data.categories.items})
-        // console.log(resp.data);
-      }
+  getNewReleaseData(token: string) {
+    axios.get(`${spotifyApiUri}/new-releases?country=TR&limit=10&offset=5`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch((err) => {
-      console.error(err);
-    })
+      .then((resp) => {
+        if (resp.status === 200) {
+          this.setState({ newReleases: resp.data.albums.items })
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
   }
 
-  getFeaturedPlaylistsData() {
-    axios.get(`${spotifyApiUri}/featured-playlists?country=TR&locale=tr_TR&timestamp=${this.date}&limit=10&offset=5`, this.config)
-    .then((resp) => {
-      if(resp.status === 200) {
-        this.setState({playlists: resp.data.playlists.items})
-        // console.log(resp.data);
-      }
+  getCategoriesData(token: string) {
+    axios.get(`${spotifyApiUri}/categories?country=TR&locale=tr_TR&limit=10&offset=3`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch((err) => {
-      console.error(err);
-    })
+      .then((resp) => {
+        if (resp.status === 200) {
+          this.setState({ categories: resp.data.categories.items })
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
   }
-  
+
+  getFeaturedPlaylistsData(token: string) {
+    axios.get(`${spotifyApiUri}/featured-playlists?country=TR&locale=tr_TR&timestamp=${this.date}&limit=10&offset=5`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((resp) => {
+        if (resp.status === 200) {
+          this.setState({ playlists: resp.data.playlists.items })
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+  }
+
   componentDidMount() {
-    this.getNewReleaseData();
-    this.getFeaturedPlaylistsData();
-    this.getCategoriesData();
+    this.getBearerToken();
   }
-  
+
   render() {
     const { newReleases, playlists, categories } = this.state;
 
