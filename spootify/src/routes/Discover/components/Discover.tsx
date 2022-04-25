@@ -47,10 +47,12 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
   tempDate = new Date();
   date = `${this.tempDate.getFullYear()}-${this.formatTwoDigits(this.tempDate.getMonth() + 1)}-${this.formatTwoDigits(this.tempDate.getDate())}T${this.formatTwoDigits(this.tempDate.getHours())}:${this.formatTwoDigits(this.tempDate.getMinutes())}:${this.formatTwoDigits(this.tempDate.getSeconds())}`;
 
+  // Bearer Token almak için gönderilecek body application/x-www-form-urlencoded tipine getirilir.
   bearerBody = new URLSearchParams({
-    "grant_type": 'client_credentials'
+    "grant_type": 'client_credentials' 
   })
 
+  // Bearer Token çevre değişkenlerinden gelen client id ve secret key okunarak servisten çekilir. Daha sonra alınan token diğer servislere parametre olarak gönderilerek verilerin gelmesini sağlar.
   getBearerToken() {
     axios.post(`https://accounts.spotify.com/api/token`,
       this.bearerBody,
@@ -67,6 +69,7 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
       })
   }
 
+  // RELEASED THIS WEEK kısmı için gerekli veriler servisten getirilerek state'e set edilir.
   getNewReleaseData(token: string) {
     axios.get(`${spotifyApiUri}/new-releases?country=TR&limit=10&offset=5`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -81,6 +84,7 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
       })
   }
 
+  // BROWSE kısmı için gerekli veriler servisten getirilerek state'e set edilir.
   getCategoriesData(token: string) {
     axios.get(`${spotifyApiUri}/categories?country=TR&locale=tr_TR&limit=10&offset=3`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -95,6 +99,7 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
       })
   }
 
+  // FEATURED PLAYLISTS kısmı için gerekli veriler servisten getirilerek state'e set edilir.
   getFeaturedPlaylistsData(token: string) {
     axios.get(`${spotifyApiUri}/featured-playlists?country=TR&locale=tr_TR&timestamp=${this.date}&limit=10&offset=5`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -110,12 +115,16 @@ export default class Discover extends Component<IDiscoverProps, IDiscoverState> 
   }
 
   componentDidMount() {
+    // Sayfa açıldığında Bearer Token almak için istek atılır.
     this.getBearerToken();
   }
 
   render() {
+    // State'de tutulan veriler değişkenlere set edilir.
     const { newReleases, playlists, categories } = this.state;
 
+
+    // Değişkenler Component'e parametre olarak gönderilir.
     return (
       <div className="discover">
         <DiscoverBlock text="RELEASED THIS WEEK" id="released" data={newReleases} />
